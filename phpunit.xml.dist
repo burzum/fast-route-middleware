@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ In the case you get "You cannot serialize or unserialize PDO instances" read:
+ https://blogs.kent.ac.uk/webdev/2011/07/14/phpunit-and-unserialized-pdo-instances/
+-->
+<phpunit
+    colors="true"
+    processIsolation="false"
+    stopOnFailure="false"
+    backupGlobals="false"
+    backupStaticAttributes="false"
+>
+    <php>
+        <ini name="memory_limit" value="-1"/>
+        <ini name="apc.enable_cli" value="1"/>
+    </php>
+
+    <!-- Add any additional test suites you want to run here -->
+    <testsuites>
+        <testsuite name="Fast Route Middleware Test Suite">
+            <directory>./tests/TestCase</directory>
+        </testsuite>
+        <!-- Add plugin test suites here. -->
+    </testsuites>
+
+    <!--
+        ANY logging MUST be disabled when running selenium tests!
+        See https://github.com/rshf/chromedriver/issues/728#issuecomment-93446962
+        En/disable the log as needed.
+    -->
+    <logging>
+        <log type="coverage-html" target="./tmp/tests/report" lowUpperBound="35" highLowerBound="70"/>
+        <log type="coverage-clover" target="./tmp/tests/coverage.xml"/>
+        <!--<log type="coverage-php" target="/tmp/coverage.serialized"/>-->
+        <!--<log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>-->
+        <!--<log type="json" target="/tmp/logfile.json"/>-->
+        <!--<log type="tap" target="/tmp/logfile.tap"/>-->
+        <!--<log type="junit" target="/tmp/logfile.xml" logIncompleteSkipped="false"/>-->
+        <!--<log type="testdox-html" target=".//tmp/tests/testdox.html"/>-->
+        <!--<log type="testdox-text" target=".//tmp/tests/testdox.txt"/>-->
+    </logging>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+
+</phpunit>
