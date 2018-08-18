@@ -1,3 +1,5 @@
-/vendor/
-/tmp/
-/.idea/
+/vendor
+/tmp
+/.idea
+/tests
+/logs

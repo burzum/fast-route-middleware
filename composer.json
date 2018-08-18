@@ -12,5 +12,15 @@
         "phpunit/phpunit": "^7.3",
         "squizlabs/php_codesniffer": "^3.3"
     },
+    "autoload": {
+      "psr-4": {
+        "Burzum\\FastRouteMiddleware\\": "src"
+      }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Burzum\\FastRouteMiddleware\\TestCase\\": "tests\\TestCase\\"
+      }
+    },
     "license": "MIT"
 }
