@@ -1,5 +1,9 @@
 # Fast Route PSR 15 Middleware
 
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+[![Scrutinizer Coverage](https://img.shields.io/scrutinizer/coverage/g/filp/whoops.svg?style=flat-square)](https://scrutinizer-ci.com/g/burzum/fast-route-psr15-middleware/)
+[![Code Quality](https://img.shields.io/scrutinizer/g/burzum/fast-route-psr15-middleware/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/burzum/fast-route-psr15-middleware/)
+
 A convenient and strict typed Fast Route middleware.
 
 ## How to use it
