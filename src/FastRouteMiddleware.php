@@ -48,6 +48,13 @@ class FastRouteMiddleware implements MiddlewareInterface
     protected $foundHandler;
 
     /**
+     * Route Attribute for the Request
+     *
+     * @var string
+     */
+    protected $routeAttribute = 'route';
+
+    /**
      * Constructor
      *
      * @param \FastRoute\Dispatcher $dispatcher Fastroute Dispatcher
@@ -65,6 +72,19 @@ class FastRouteMiddleware implements MiddlewareInterface
     }
 
     /**
+     * Sets the route attribute name
+     *
+     * @param string $attributeName Attribute Name
+     * @return $this
+     */
+    public function setRouteAttribute(string $attributeName): self
+    {
+        $this->routeAttribute = $attributeName;
+
+        return $this;
+    }
+
+    /**
      * Process an incoming server request and return a response, optionally
      * delegating response creation to a handler.
      *
@@ -76,26 +96,30 @@ class FastRouteMiddleware implements MiddlewareInterface
     {
         $routeInfo = $this->dispatch();
         $result = null;
-        //die(var_dump($routeInfo));
+
         switch ($routeInfo[0]) {
             case DispatcherInterface::NOT_FOUND:
-                if (!is_null($this->notFoundHandler)) {
+                if ($this->notFoundHandler !== null) {
                     $result = $this->notFoundHandler->handle($request);
                 }
                 break;
             case DispatcherInterface::METHOD_NOT_ALLOWED:
-                if (!is_null($this->notAllowedHandler)) {
+                if ($this->notAllowedHandler !== null) {
                     $result = $this->notAllowedHandler->handle($request, $routeInfo[1]);
                 }
                 break;
             case DispatcherInterface::FOUND:
-                if (!is_null($this->foundHandler)) {
+                $request = $request->withAttribute(
+                    $this->routeAttribute,
+                    new RouteInfo($routeInfo[1], $routeInfo[2])
+                );
+                if ($this->foundHandler !== null) {
                     $result = $this->foundHandler->handle($request, $routeInfo[1], $routeInfo[2]);
                 }
                 break;
         }
 
-        if ($request instanceof ResponseInterface) {
+        if ($result instanceof ResponseInterface) {
             return $result;
         }
 
