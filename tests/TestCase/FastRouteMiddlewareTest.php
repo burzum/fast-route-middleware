@@ -80,6 +80,10 @@ class FastRouteMiddlewareTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/';
 
+        $this->requestMock->expects($this->any())
+            ->method('withAttribute')
+            ->willReturnSelf();
+
         $this->foundHandlerMock
             ->expects($this->at(0))
             ->method('handle')
