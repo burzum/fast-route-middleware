@@ -1,5 +1,8 @@
-/vendor
-/tmp
+/.phpunit.result.cache
 /.idea
+
+/bin
+/tmp
 /tests
 /logs
+/vendor
