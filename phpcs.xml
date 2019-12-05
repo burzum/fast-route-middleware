@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="PSR">
-    <rule ref="./vendor/squizlabs/php_codesniffer/src/Standards/PSR2/ruleset.xml"/>
-    <file>./src</file>
-    <file>./tests</file>
+<ruleset name="Phauthentic">
+    <rule ref="PSR12">
+        <exclude name="Generic.Files.LineLength.TooLong"/>
+    </rule>
 </ruleset>

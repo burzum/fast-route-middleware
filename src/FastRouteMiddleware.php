@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Burzum\FastRouteMiddleware;
@@ -48,16 +49,12 @@ class FastRouteMiddleware implements MiddlewareInterface
     protected $foundHandler;
 
     /**
-     * Route Attribute for the Request
-     *
-     * @var string
-     */
-    protected $routeAttribute = 'route';
-
-    /**
      * Constructor
      *
      * @param \FastRoute\Dispatcher $dispatcher Fastroute Dispatcher
+     * @param null|\Burzum\FastRouteMiddleware\Handler\FoundHandlerInterface $foundHandler Found Handler
+     * @param null|\Burzum\FastRouteMiddleware\Handler\NotFoundHandlerInterface $notAllowedHandler Not Found Handler
+     * @param null|\Burzum\FastRouteMiddleware\Handler\NotAllowedHandlerInterface $notAllowedHandler Not Allowed Handler
      */
     public function __construct(
         DispatcherInterface $dispatcher,
@@ -68,20 +65,7 @@ class FastRouteMiddleware implements MiddlewareInterface
         $this->dispatcher = $dispatcher;
         $this->foundHandler = $foundHandler;
         $this->notFoundHandler = $notFoundHandler;
-        $this->notAllowedHandler = $notFoundHandler;
-    }
-
-    /**
-     * Sets the route attribute name
-     *
-     * @param string $attributeName Attribute Name
-     * @return $this
-     */
-    public function setRouteAttribute(string $attributeName): self
-    {
-        $this->routeAttribute = $attributeName;
-
-        return $this;
+        $this->notAllowedHandler = $notAllowedHandler;
     }
 
     /**
@@ -92,8 +76,10 @@ class FastRouteMiddleware implements MiddlewareInterface
      * @param \Psr\Http\Server\RequestHandlerInterface $requestHandler Request Handler
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $requestHandler): ResponseInterface
-    {
+    public function process(
+        ServerRequestInterface $request,
+        RequestHandlerInterface $requestHandler
+    ): ResponseInterface {
         $routeInfo = $this->dispatch();
         $result = null;
 
@@ -102,24 +88,23 @@ class FastRouteMiddleware implements MiddlewareInterface
                 if ($this->notFoundHandler !== null) {
                     $result = $this->notFoundHandler->handle($request);
                 }
+
                 break;
             case DispatcherInterface::METHOD_NOT_ALLOWED:
                 if ($this->notAllowedHandler !== null) {
                     $result = $this->notAllowedHandler->handle($request, $routeInfo[1]);
                 }
+
                 break;
             case DispatcherInterface::FOUND:
-                $request = $request->withAttribute(
-                    $this->routeAttribute,
-                    new RouteInfo($routeInfo[1], $routeInfo[2])
-                );
                 if ($this->foundHandler !== null) {
                     $result = $this->foundHandler->handle($request, $routeInfo[1], $routeInfo[2]);
                 }
+
                 break;
         }
 
-        if ($result instanceof ResponseInterface) {
+        if ($request instanceof ResponseInterface) {
             return $result;
         }
 
@@ -140,6 +125,7 @@ class FastRouteMiddleware implements MiddlewareInterface
         if (false !== $pos = strpos($uri, '?')) {
             $uri = substr($uri, 0, $pos);
         }
+
         $uri = rawurldecode($uri);
 
         return $this->dispatcher->dispatch($httpMethod, $uri);

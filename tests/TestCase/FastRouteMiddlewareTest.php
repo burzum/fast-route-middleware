@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Burzum\FastRouteMiddleware\TestCase;
@@ -14,7 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PHPUnit\Framework\TestCase;
 
-use function \FastRoute\SimpleDispatcher;
+use function FastRoute\SimpleDispatcher;
 
 /**
  * FastRouteMiddlewareTest
@@ -54,10 +55,9 @@ class FastRouteMiddlewareTest extends TestCase
     /**
      * @inheritDoc
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
-
         $this->foundHandlerMock = $this->getMockBuilder(FoundHandlerInterface::class)->getMock();
         $this->notFoundHandlerMock = $this->getMockBuilder(NotFoundHandlerInterface::class)->getMock();
         $this->notAllowedHandlerMock = $this->getMockBuilder(NotAllowedHandlerInterface::class)->getMock();
@@ -71,38 +71,25 @@ class FastRouteMiddlewareTest extends TestCase
      */
     public function testFoundHandling(): void
     {
-        $dispatcher = SimpleDispatcher(function(RouteCollector $r) {
+        $dispatcher = SimpleDispatcher(function (RouteCollector $r) {
+
             $r->addRoute(['GET'], '/', 'Home');
         });
-
-        $fastRoute = $this->_fastRouteSetup($dispatcher);
-
+        $fastRoute = $this->fastRouteSetup($dispatcher);
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/';
-
-        $this->requestMock->expects($this->any())
-            ->method('withAttribute')
-            ->willReturnSelf();
-
         $this->foundHandlerMock
             ->expects($this->at(0))
             ->method('handle')
-            ->with(
-                $this->requestMock,
-                'Home',
-                []
-            );
-
+            ->with($this->requestMock, 'Home', []);
         $fastRoute->process($this->requestMock, $this->requestHandlerMock);
 
         // Test that none of the handlers is triggered but the "next" middleware called
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/does-not-exist';
-
         $this->requestHandlerMock->expects($this->at(0))
             ->method('handle')
             ->with($this->requestMock);
-
         $fastRoute->process($this->requestMock, $this->requestHandlerMock);
     }
 
@@ -111,13 +98,8 @@ class FastRouteMiddlewareTest extends TestCase
      *
      * @return \Burzum\FastRouteMiddleware\FastRouteMiddleware;
      */
-    protected function _fastRouteSetup(GroupCountBased $dispatcher): FastRouteMiddleware
+    protected function fastRouteSetup(GroupCountBased $dispatcher): FastRouteMiddleware
     {
-        return new FastRouteMiddleware(
-            $dispatcher,
-            $this->foundHandlerMock,
-            $this->notFoundHandlerMock,
-            $this->notAllowedHandlerMock
-        );
+        return new FastRouteMiddleware($dispatcher, $this->foundHandlerMock, $this->notFoundHandlerMock, $this->notAllowedHandlerMock);
     }
 }
